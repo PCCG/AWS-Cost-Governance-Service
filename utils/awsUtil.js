@@ -8,24 +8,28 @@ AWS.config.accessKeyId = ''
 AWS.config.secretAccessKey = ''
 
 
-AWS.updateAwsRegion = function(region){
+AWS.updateAwsRegion = (region) => {
 	AWS.config.region = region
 }
 
-AWS.updateAwsAccessKeyId = function(accessKeyId){
+AWS.updateAwsAccessKeyId = (accessKeyId) => {
 	AWS.config.accessKeyId = accessKeyId
 }
 
-AWS.updateAwsSecretAccessKey = function(secretAccessKey){
+AWS.updateAwsSecretAccessKey = (secretAccessKey) => {
 	AWS.config.secretAccessKey = secretAccessKey
 }
 
-AWS.createNewEC2Obj = function(){
+AWS.createNewEC2Obj = () => {
 	return new AWS.EC2()
 }
 
-AWS.createNewCostExplorerObj = function () {
+AWS.createNewCostExplorerObj = () => {
     return new AWS.CostExplorer()
+}
+
+AWS.createNewS3Object = () => {
+    return new AWS.S3()
 }
 
 // AWS.config.update({
