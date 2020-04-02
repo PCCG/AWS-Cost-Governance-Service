@@ -6,6 +6,7 @@ var logger = require('morgan');
 const accountsRoute = require('./routes/awsAccounts');
 const ec2Route = require('./routes/awsElasticCloudCompute');
 const s3Route = require('./routes/awsSimpleStorageService');
+const curRoute = require('./routes/costAndUsageReports');
 
 
 const app = express();
@@ -19,5 +20,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/aws', accountsRoute);
 app.use('/api/v1/aws', ec2Route);
 app.use('/api/v1/aws', s3Route);
+app.use('/api/v1/aws', curRoute);
 
 module.exports = app;

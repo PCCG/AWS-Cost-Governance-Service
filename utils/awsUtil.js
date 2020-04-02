@@ -20,17 +20,13 @@ AWS.updateAwsSecretAccessKey = (secretAccessKey) => {
 	AWS.config.secretAccessKey = secretAccessKey
 }
 
-AWS.createNewEC2Obj = () => {
-	return new AWS.EC2()
-}
+AWS.createNewEC2Obj = () => new AWS.EC2()
 
-AWS.createNewCostExplorerObj = () => {
-    return new AWS.CostExplorer()
-}
+AWS.createNewCostExplorerObj = () => new AWS.CostExplorer()
 
-AWS.createNewS3Object = () => {
-    return new AWS.S3()
-}
+AWS.createNewS3Object = () => new AWS.S3()
+
+AWS.createNewCurObject = () => new AWS.CUR()
 
 // AWS.config.update({
 //     httpOptions: { agent: proxy("http://web-proxy.in.softwaregrp.net:8080") },
