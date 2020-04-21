@@ -28,6 +28,8 @@ AWS.createNewS3Object = () => new AWS.S3()
 
 AWS.createNewCurObject = () => new AWS.CUR()
 
+AWS.createNewRdsObject = () => new AWS.RDS()
+
 // AWS.config.update({
 //     httpOptions: { agent: proxy("http://web-proxy.in.softwaregrp.net:8080") },
 //     httpsOptions: { agent: proxy("http://web-proxy.in.softwaregrp.net:8080") }

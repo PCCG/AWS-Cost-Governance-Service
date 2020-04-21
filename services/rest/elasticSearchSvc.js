@@ -12,15 +12,23 @@ const esAwsAccountsClient = axios.create({
 });
 
 
-//Each AWS instance/service instance will be treated as an artifact. The artifacts are stored in Elasticsearch
-//so that they can be retrieved later when a user searches for an artifact. If an artifact cannot be found in
-//Elasticsearch, a call will be made to AWS to look for the artifact.
+//Each AWS service instance will be treated as an artifact. The artifacts are stored in Elasticsearch
+//so that they can be retrieved later when a user looks for an artifact. If an artifact cannot be found in
+//Elasticsearch, a call will be made to AWS to retrieve the artifact.
 const esAwsEc2Client = axios.create({
     baseURL: process.env.ES_EC2_INSTANCES_BASE_URL,
     headers: {
         "Content-Type": "application/json",
         "Accept": "application/json"
     }
+});
+
+const esAwsS3Client = axios.create({
+    baseURL: process.env.ES_S3_BUCKETS_BASE_URL,
+    headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    }    
 });
 
 
