@@ -1,38 +1,28 @@
-const AWS = require('aws-sdk')
-const proxy = require('proxy-agent')
+const AWS = require('aws-sdk');
+const proxy = require('proxy-agent');
 
-AWS.config = new AWS.Config()
+//Moving away from the global configuration applicable to the AWS SDK. The configuration will now be applicable to
+//a particular service. This way, when the server is busy processing multiple requests, we create the service instance
+//with the credentials applicable to the particular request
 
-AWS.config.region = 'us-east-1'
-AWS.config.accessKeyId = ''
-AWS.config.secretAccessKey = ''
+const AWS_COST_EXPLORER_REGION = 'us-east-1';
+const AWS_CUR_REGION = 'us-east-1';
+//If the application is going to be containerized, expose a YAML paramater that users can configure to set the variable mentioned below
+const AWS_DEFAULT_SERVICE_ENDPOINT_REGION = process.env.AWS_DEFAULT_SERVICE_ENDPOINT_REGION || 'us-east-1';
 
+AWS.createNewEC2Object = (accessKeyId, secretAccessKey, region = AWS_DEFAULT_SERVICE_ENDPOINT_REGION) => new AWS.EC2({accessKeyId, secretAccessKey, region});
 
-AWS.updateAwsRegion = (region) => {
-	AWS.config.region = region
-}
+AWS.createNewCostExplorerObject = (accessKeyId, secretAccessKey) => new AWS.CostExplorer({accessKeyId, secretAccessKey, region: AWS_COST_EXPLORER_REGION});
 
-AWS.updateAwsAccessKeyId = (accessKeyId) => {
-	AWS.config.accessKeyId = accessKeyId
-}
+AWS.createNewS3Object = (accessKeyId, secretAccessKey, region = AWS_DEFAULT_SERVICE_ENDPOINT_REGION) => new AWS.S3({accessKeyId, secretAccessKey, region});
 
-AWS.updateAwsSecretAccessKey = (secretAccessKey) => {
-	AWS.config.secretAccessKey = secretAccessKey
-}
+AWS.createNewCurObject = (accessKeyId, secretAccessKey) => new AWS.CUR({accessKeyId, secretAccessKey, region: AWS_CUR_REGION});
 
-AWS.createNewEC2Obj = () => new AWS.EC2()
-
-AWS.createNewCostExplorerObj = () => new AWS.CostExplorer()
-
-AWS.createNewS3Object = () => new AWS.S3()
-
-AWS.createNewCurObject = () => new AWS.CUR()
-
-AWS.createNewRdsObject = () => new AWS.RDS()
+AWS.createNewRdsObject = (accessKeyId, secretAccessKey, region = AWS_DEFAULT_SERVICE_ENDPOINT_REGION) => new AWS.RDS({accessKeyId, secretAccessKey, region});
 
 // AWS.config.update({
-//     httpOptions: { agent: proxy("http://web-proxy.in.softwaregrp.net:8080") },
-//     httpsOptions: { agent: proxy("http://web-proxy.in.softwaregrp.net:8080") }
+//     httpOptions: { agent: proxy("") },
+//     httpsOptions: { agent: proxy("") }
 // })
 
 module.exports = AWS

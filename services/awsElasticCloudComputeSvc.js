@@ -1,20 +1,17 @@
 const AWS = require('../utils/awsUtil');
 
 module.exports =  {
-    //Data consumed by the dashboard
-    fetchEc2InstancesAcrossRegions: async function () {
-        const params = {}
-        const instancesAcrossRegions = []
-        let ec2 = AWS.createNewEC2Obj();
-        const regions = await this.getEc2Regions() //Arrow functions do not have their own "this". Hence, the method hasn't been defined using the "Fat Arrow" syntax.
-        const ec2DataPromises = []
+    fetchEc2InstancesAcrossRegions: async function (ec2ServiceObject) {
+        const params = {};
+        const instancesAcrossRegions = [];
+        const regions = await this.getEc2Regions(ec2ServiceObject); //Arrow functions do not have their own "this". Hence, the method hasn't been defined using the "Fat Arrow" syntax.
+        const ec2DataPromises = [];
         for (region of regions) {
-            let regionName = region.RegionName
-            AWS.updateAwsRegion(regionName);
-            ec2 = AWS.createNewEC2Obj();
-            ec2DataPromises.push(ec2.describeInstances(params).promise())
-        }     
-        let ec2DataAcrossRegions = await Promise.all(ec2DataPromises)
+            let regionName = region.RegionName;
+            ec2ServiceObject = AWS.createNewEC2Object(ec2ServiceObject.config.accessKeyId, ec2ServiceObject.config.secretAccessKey, regionName);
+            ec2DataPromises.push(ec2ServiceObject.describeInstances(params).promise());
+        }    
+        let ec2DataAcrossRegions = await Promise.all(ec2DataPromises);
         ec2DataAcrossRegions.forEach(ec2Data => {
             ec2Data["Reservations"].forEach(function(instance){
                 instance.Instances.forEach(function(Instance){
@@ -27,38 +24,45 @@ module.exports =  {
                     instancesAcrossRegions.push(obj);
                 })
             })  
-        })     
+        })  
         return instancesAcrossRegions;   
     },
-    getEc2Regions: async (ec2ContextFromMonitoringService) => {
-        const params = {}
-        let ec2 = AWS.createNewEC2Obj()
-        if(ec2ContextFromMonitoringService) {
-            ec2 = ec2ContextFromMonitoringService
-        }
-        const regionsData = await ec2.describeRegions(params).promise()
-        return regionsData.Regions
+    createEbsSnaphotsForInstancesAssociatedWithAccount: async function (ec2ServiceObject) {
+        const params = {
+            InstanceSpecification: {
+              ExcludeBootVolume: true
+            }
+        };
+        const snapshotPromises = [];
+        const instanceIdsForAllInstances = await this.getInstanceIdsForAllInstancesAssociatedWithAccount();
+        instanceIdsForAllInstances.forEach((instance) => {
+            params.Description = new Date().toString();
+            params.InstanceSpecification.InstanceId = instance;
+            snapshotPromises.push(ec2ServiceObject.createSnapshots(params).promise().catch(err => {
+                console.log(err);
+            }));
+        });
+        const snapshotOperationStatus = await Promise.all(snapshotPromises);
     },
-    stopEc2Instances: async (instanceIds, ec2ContextFromMonitoringService) => {
-        let ec2 = AWS.createNewEC2Obj()
-        if(ec2ContextFromMonitoringService) {
-            ec2 = ec2ContextFromMonitoringService
-        }
+    getEc2Regions: async (ec2ServiceObject) => {
+        const params = {};
+        const regionsData = await ec2ServiceObject.describeRegions(params).promise();
+        return regionsData.Regions;
+    },
+    stopEc2InstancesAssociatedWithAccount: async function (ec2ServiceObject) {
+        const instanceIdsForAllInstances = await this.getInstanceIdsForAllInstancesAssociatedWithAccount();
         const params = {
-            InstanceIds: [instanceIds]
-           }
-        const stats = await ec2.stopInstances(params).promise()
-        return stats
+            InstanceIds: instanceIdsForAllInstances
+        };
+        const stats = await ec2ServiceObject.stopInstances(params).promise();
+        return stats;
     },  
-    terminateEc2Instances: async (instanceIds, ec2ContextFromMonitoringService) => {
-        let ec2 = AWS.createNewEC2Obj()
-        if(ec2ContextFromMonitoringService) {
-            ec2 = ec2ContextFromMonitoringService
-        }
+    terminateEc2InstancesAssociatedWithAccount: async function (ec2ServiceObject) {
+        const ec2Regions = await this.getEc2Regions(ec2ServiceObject);
         const params = {
-            InstanceIds: [instanceIds]
-           }
-        const stats = await ec2.terminateInstances(params).promise()
-        return stats    
+            InstanceIds: instanceIdsForAllInstances
+        };
+        const stats = await ec2ServiceObject.terminateInstances(params).promise();
+        return stats;
     }
 }

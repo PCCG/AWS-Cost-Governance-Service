@@ -1,29 +1,19 @@
 const express = require('express');
 const router = express.Router();
 
+const AWS = require('../utils/awsUtil');
+
 const awsSvc = require('../services/awsSvc');
 const awsS3Svc = require('../services/awsSimpleStorageServiceSvc');
 
-const service = 'Amazon Simple Storage Service';
+router.use((req, res, next) => {
+    awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewS3Object);
+})
 
 router.post('/s3/listBuckets', async (req, res) => {
-    awsSvc.validateIfAwsCredsPresent(req.body, res);
-    const listOfS3Buckets = await awsS3Svc.fetchBucketsAcrossAllRegions();
+    const s3ServiceObject = res.locals.serviceObject;
+    const listOfS3Buckets = await awsS3Svc.fetchBucketsAcrossAllRegions(s3ServiceObject);
     res.send(listOfS3Buckets);
-})
-
-router.post('/s3/cost/getSpendPattern', function (req, res) {
-    awsSvc.validateIfAwsCredsPresent(req.body, res);
-    awsSvc.getCostPattern(service).then(costPattern => {
-        res.send(costPattern)
-    })
-})
-
-router.post('/s3/cost/getSpendCurrentMonth', function (req, res) {
-    awsSvc.validateIfAwsCredsPresent(req.body, res)
-    awsSvc.getCostCurrentMonth(service).then(cost => {
-        res.send(cost)
-    })
 })
 
 module.exports = router;

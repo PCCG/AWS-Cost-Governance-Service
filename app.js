@@ -10,6 +10,7 @@ const ec2Route = require('./routes/awsElasticCloudCompute');
 const s3Route = require('./routes/awsSimpleStorageService');
 const curRoute = require('./routes/costAndUsageReports');
 const rdsRoute = require('./routes/awsRds');
+const ceRoute = require('./routes/awsCostExplorer');
 
 
 const app = express();
@@ -25,5 +26,6 @@ app.use(AWS_API_ENDPOINT, ec2Route);
 app.use(AWS_API_ENDPOINT, s3Route);
 app.use(AWS_API_ENDPOINT, curRoute);
 app.use(AWS_API_ENDPOINT, rdsRoute);
+app.use(AWS_API_ENDPOINT, ceRoute);
 
 module.exports = app;

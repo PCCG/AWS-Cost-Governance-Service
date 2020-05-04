@@ -1,15 +1,17 @@
 const router = require('express').Router();
 
+const AWS = require('../utils/awsUtil');
+
 const awsSvc = require('../services/awsSvc');
 const awsRdsSvc = require('../services/awsRdsSvc');
 
 router.use((req, res, next) => {
-    awsSvc.validateIfAwsCredsPresent(req.body, res);
-    next();
+    awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewRdsObject);
 })
 
 router.post('/rds/listAllRdsInstances', async (req, res) => {
-    const listOfRdsInstancesAcrossAllRegions = await awsRdsSvc.fetchRdsInstancesAcrossAllRegions();
+    const rdsServiceObject = res.locals.serviceObject;
+    const listOfRdsInstancesAcrossAllRegions = await awsRdsSvc.fetchRdsInstancesAcrossAllRegions(rdsServiceObject);
     res.send(listOfRdsInstancesAcrossAllRegions);
 })
 

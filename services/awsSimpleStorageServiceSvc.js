@@ -1,20 +1,16 @@
-const AWS = require('../utils/awsUtil');
-const moment = require('moment');
-
 module.exports = {
-    fetchBucketsAcrossAllRegions: async () => {
-        const s3 = AWS.createNewS3Object();
+    fetchBucketsAcrossAllRegions: async (s3ServiceObject) => {
         const tagSetKey = 'TagSet';
         const bucketRegionKey = 'Region';
         const awsResponseBucketRegionKey = 'LocationConstraint';
-        let listOfBuckets = await s3.listBuckets().promise();
+        let listOfBuckets = await s3ServiceObject.listBuckets().promise();
         const fetchBucketTagsPromises = [];
         const fetchBucketRegionPromises = [];
         listOfBuckets = listOfBuckets.Buckets;
         listOfBuckets.forEach(bucket => {
             const bucketParams = {Bucket: bucket.Name};
-            fetchBucketTagsPromises.push(s3.getBucketTagging(bucketParams).promise());
-            fetchBucketRegionPromises.push(s3.getBucketLocation(bucketParams).promise());
+            fetchBucketTagsPromises.push(s3ServiceObject.getBucketTagging(bucketParams).promise());
+            fetchBucketRegionPromises.push(s3ServiceObject.getBucketLocation(bucketParams).promise());
         })
         const listOfBucketTags = await Promise.all(fetchBucketTagsPromises);
         const listOfBucketRegions = await Promise.all(fetchBucketRegionPromises);

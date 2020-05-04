@@ -4,27 +4,16 @@ const router = express.Router();
 const awsSvc = require('../services/awsSvc');
 const awsEc2Svc = require('../services/awsElasticCloudComputeSvc.js');
 
-const service = 'Amazon Elastic Compute Cloud - Compute';
+const AWS = require('../utils/awsUtil');
 
-router.post('/ec2/fetchInstances', function(req, res){
-    awsSvc.validateIfAwsCredsPresent(req.body, res);
-    awsEc2Svc.fetchEc2InstancesAcrossRegions().then(instancesAcrossRegions => {
-        res.send(instancesAcrossRegions)
-    })
+router.use((req, res, next) => {
+    awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewEC2Object);
 })
 
-router.post('/ec2/cost/getSpendPattern', function (req, res) {
-    awsSvc.validateIfAwsCredsPresent(req.body, res);
-    awsSvc.getCostPattern(service).then(costPattern => {
-        res.send(costPattern)
-    })
-})
-
-router.post('/ec2/cost/getSpendCurrentMonth', function (req, res) {
-    awsSvc.validateIfAwsCredsPresent(req.body, res)
-    awsSvc.getCostCurrentMonth(service).then(cost => {
-        res.send(cost)
-    })
+router.post('/ec2/fetchInstances', async (req, res) => {
+    const ec2ServiceObject = res.locals.serviceObject;
+    const instancesAssociatedWithAccount = await awsEc2Svc.fetchEc2InstancesAcrossRegions(ec2ServiceObject);
+    res.send(instancesAssociatedWithAccount);
 })
 
 module.exports = router;
