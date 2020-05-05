@@ -19,13 +19,12 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(AWS_API_ENDPOINT, accountsRoute);
+app.use(AWS_API_ENDPOINT, ceRoute);
 app.use(AWS_API_ENDPOINT, ec2Route);
 app.use(AWS_API_ENDPOINT, s3Route);
 app.use(AWS_API_ENDPOINT, curRoute);
 app.use(AWS_API_ENDPOINT, rdsRoute);
-app.use(AWS_API_ENDPOINT, ceRoute);
 
 module.exports = app;

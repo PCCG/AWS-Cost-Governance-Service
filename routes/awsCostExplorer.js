@@ -6,22 +6,28 @@ const awsCeSvc = require('../services/awsCostExplorerSvc');
 
 const AWS = require('../utils/awsUtil');
 
-router.use((req, res, next) => {
-    awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewCostExplorerObject);
-})
+const costExplorerServiceFilters = require('../constants/costExplorerServiceFilter');
 
-router.post('/cost/getSpendPattern', async (req, res) => {
+const costExplorerServiceObjectMiddleware = (req, res, next) => {
+    awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewCostExplorerObject);
+}
+
+router.post('/cost/getSpendPattern', costExplorerServiceObjectMiddleware, async (req, res) => {
     const costExplorerServiceFilter = req.body.costExplorerServiceFilter;
     const ceServiceObject = res.locals.serviceObject;
     const spendPattern = await awsCeSvc.getCostPattern(ceServiceObject, costExplorerServiceFilter);
     res.send(spendPattern);
 })
 
-router.post('/cost/getSpendCurrentMonth', async (req, res) => {
+router.post('/cost/getSpendCurrentMonth', costExplorerServiceObjectMiddleware, async (req, res) => {
     const costExplorerServiceFilter = req.body.costExplorerServiceFilter;
     const ceServiceObject = res.locals.serviceObject;
     const spendForTheCurrentMonth = awsCeSvc.getCostCurrentMonth(ceServiceObject, costExplorerServiceFilter);
     res.send(spendForTheCurrentMonth);
+})
+
+router.get('/cost/serviceFilters', async (req, res) => {
+    res.send(costExplorerServiceFilters);
 })
 
 module.exports = router;
