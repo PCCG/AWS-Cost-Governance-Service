@@ -20,6 +20,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+
+/*The order in which routers are specified does matter. The middlewares that are specific to the 
+routes that are specified first somehow act upon the router (which does not house any middlewares)
+that is specified in the end.*/
 app.use(AWS_API_ENDPOINT, accountsRoute);
 app.use(AWS_API_ENDPOINT, ceRoute);
 app.use(AWS_API_ENDPOINT, ec2Route);
