@@ -20,6 +20,8 @@ AWS.createNewCurObject = (accessKeyId, secretAccessKey) => new AWS.CUR({accessKe
 
 AWS.createNewRdsObject = (accessKeyId, secretAccessKey, region = AWS_DEFAULT_SERVICE_ENDPOINT_REGION) => new AWS.RDS({accessKeyId, secretAccessKey, region});
 
+AWS.convertAvailabilityZoneToRegion = availabilityZone => availabilityZone.slice(0, -1);
+
 // AWS.config.update({
 //     httpOptions: { agent: proxy("") },
 //     httpsOptions: { agent: proxy("") }

@@ -12,7 +12,7 @@ router.use((req, res, next) => {
 
 router.post('/ec2/fetchInstances', async (req, res) => {
     const ec2ServiceObject = res.locals.serviceObject;
-    const instancesAssociatedWithAccount = await awsEc2Svc.fetchEc2InstancesAcrossRegions(ec2ServiceObject);
+    const instancesAssociatedWithAccount = await awsEc2Svc.fetchEc2InstancesAssociatedWithAccount(ec2ServiceObject);
     res.send(instancesAssociatedWithAccount);
 })
 
