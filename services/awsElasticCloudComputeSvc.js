@@ -48,18 +48,20 @@ module.exports =  {
             InstanceSpecification: {}
         };
         const snapshotOperationPromises = [];
-        let snapshotDescription = 'Creation of a snapshot initiated by the Cost Governance Service for the instance with the ID ';
+        const operationDescriptionList = [];
         const ec2InstancesAssociatedWithAccountByRegion = await this.listInstancesAssociatedWithAccountByRegion(ec2ServiceObject);
         for (region in ec2InstancesAssociatedWithAccountByRegion) {
             ec2ServiceObject = AWS.createNewEC2Object(ec2ServiceObject.config.accessKeyId, ec2ServiceObject.config.secretAccessKey, region);
             ec2InstancesAssociatedWithAccountByRegion[region].forEach(instanceObj => {
                 const ec2InstanceId = instanceObj[EC2_INSTANCE_ID_PARAM_KEY];
+                const operationDescription = `Creation of a snapshot initiated by the Cost Governance Service for the instance with the ID ${ec2InstanceId} in the region ${region}`;
+                operationDescriptionList.push(operationDescription);
                 params.InstanceSpecification[EC2_INSTANCE_ID_PARAM_KEY] = ec2InstanceId;
-                params.Description = snapshotDescription.concat(ec2InstanceId);
+                params.Description = operationDescription;
                 snapshotOperationPromises.push(ec2ServiceObject.createSnapshots(params).promise());
             })
         }
-        const snapshotOperationStatus = await Promise.all(snapshotOperationPromises);
+        const operationStatus = await Promise.all(snapshotOperationPromises);
     },
     getEc2Regions: async (ec2ServiceObject) => {
         const regionsData = await ec2ServiceObject.describeRegions().promise();
@@ -72,6 +74,7 @@ module.exports =  {
             ec2ServiceObject = AWS.createNewEC2Object(ec2ServiceObject.config.accessKeyId, ec2ServiceObject.config.secretAccessKey, region);
             const instancesSpecificToRegion = ec2InstancesAssociatedWithAccountByRegion[region].map(instanceObj => instanceObj[EC2_INSTANCE_ID_PARAM_KEY]);
             params[EC2_INSTANCES_ID_PARAM_KEY] = instancesSpecificToRegion;
+            const operationDescription = `The following instances present in the region ${region} are going to be stopped: ${JSON.stringify(instancesSpecificToRegion)}`;
             const operationStatus = await ec2ServiceObject.stopInstances(params).promise();
         } 
     },  
@@ -82,6 +85,7 @@ module.exports =  {
             ec2ServiceObject = AWS.createNewEC2Object(ec2ServiceObject.config.accessKeyId, ec2ServiceObject.config.secretAccessKey, region);
             const instancesSpecificToRegion = ec2InstancesAssociatedWithAccountByRegion[region].map(instanceObj => instanceObj[EC2_INSTANCE_ID_PARAM_KEY]);
             params[EC2_INSTANCES_ID_PARAM_KEY] = instancesSpecificToRegion;
+            const operationDescription = `The following instances present in the region ${region} are going to be terminated: ${JSON.stringify(instancesSpecificToRegion)}`;
             const operationStatus = await ec2ServiceObject.terminateInstances(params).promise();
         } 
     }

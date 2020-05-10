@@ -11,7 +11,7 @@ router.use((req, res, next) => {
 
 router.post('/rds/listAllRdsInstances', async (req, res) => {
     const rdsServiceObject = res.locals.serviceObject;
-    const listOfRdsInstancesAcrossAllRegions = await awsRdsSvc.fetchRdsInstancesAcrossAllRegions(rdsServiceObject);
+    const listOfRdsInstancesAcrossAllRegions = await awsRdsSvc.fetchRdsInstancesAssociatedWithAccount(rdsServiceObject);
     res.send(listOfRdsInstancesAcrossAllRegions);
 })
 
