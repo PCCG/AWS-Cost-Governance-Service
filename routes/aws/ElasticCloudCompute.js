@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const awsSvc = require('../services/awsSvc');
-const awsEc2Svc = require('../services/awsElasticCloudComputeSvc.js');
+const awsSvc = require('../../services/aws/awsSvc');
+const awsEc2Svc = require('../../services/aws/awsElasticCloudComputeSvc.js');
 
-const AWS = require('../utils/awsUtil');
+const AWS = require('../../utils/awsUtil');
 
 router.use((req, res, next) => {
     awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewEC2Object);

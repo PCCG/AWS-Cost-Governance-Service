@@ -1,3 +1,12 @@
+/*  This file is responsible for exposing methods that help in creating service objects
+    This file merely acts as a wrapper on top of the AWS SDK. It should be kept in mind that
+    certain services such as the Cost Explorer expose endpoints in a specific region. It 
+    does not make sense to expose a wrapper function that accepts region as a parameter. A wrapper
+    function in general should accept the Access Key ID and the Secret Access Key as parameters. If
+    the service exposes endpoints in multiple regions, then the wrapper function is supposed to accept
+    region as a parameter.
+*/
+
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
 

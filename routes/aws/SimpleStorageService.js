@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const AWS = require('../utils/awsUtil');
+const AWS = require('../../utils/awsUtil');
 
-const awsSvc = require('../services/awsSvc');
-const awsS3Svc = require('../services/awsSimpleStorageServiceSvc');
+const awsSvc = require('../../services/aws/awsSvc');
+const awsS3Svc = require('../../services/aws/awsSimpleStorageServiceSvc');
 
 router.use((req, res, next) => {
     awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewS3Object);

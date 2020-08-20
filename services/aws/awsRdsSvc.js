@@ -1,7 +1,7 @@
-const AWS = require('../utils/awsUtil');
-const awsEc2Svc = require('../services/awsElasticCloudComputeSvc');
+const AWS = require('../../utils/awsUtil');
+const awsEc2Svc = require('../../services/aws/awsElasticCloudComputeSvc');
 
-const RDS_INSTANCES_KEY = 'DBInstances'; 
+const RDS_INSTANCES_KEY = 'DBInstances';
 const RDS_INSTANCE_IDENTIFIER = 'DBInstanceIdentifier';
 const RDS_INSTANCE_REGION_KEY = 'RegionName';
 
@@ -64,6 +64,6 @@ module.exports = {
                 deleteRdsInstancePromises.push(deleteRdsInstancePromise);
             })
         })
-        const operationStatus = await Promise.all(deleteRdsInstancePromises);    
+        const operationStatus = await Promise.all(deleteRdsInstancePromises);
     }
 }

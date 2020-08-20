@@ -1,9 +1,9 @@
 const router = require('express').Router();
 
-const AWS = require('../utils/awsUtil');
+const AWS = require('../../utils/awsUtil');
 
-const awsSvc = require('../services/awsSvc');
-const awsRdsSvc = require('../services/awsRdsSvc');
+const awsSvc = require('../../services/aws/awsSvc');
+const awsRdsSvc = require('../../services/aws/awsRdsSvc');
 
 router.use((req, res, next) => {
     awsSvc.validateIfAwsCredsPresent(req, res, next, AWS.createNewRdsObject);

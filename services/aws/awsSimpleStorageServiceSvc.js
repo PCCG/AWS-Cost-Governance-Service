@@ -19,5 +19,15 @@ module.exports = {
             listOfBuckets[index][bucketRegionKey] = listOfBucketRegions[index][awsResponseBucketRegionKey];
         }
         return listOfBuckets;
+    },
+    //To be utilized by the service that is responsible for analyzing the Cost and Usage reports.
+    //This method returns a response of the type "application/octet-stream"
+    fetchObjectFromBucket: async (bucket, objectKey, s3ServiceObject) => {
+      const params = {
+        Bucket: bucket,
+        Key: objectKey
+      };
+      const manifestFileMetadata = await s3ServiceObject.getObject(params).promise();
+      return manifestFileMetadata.Body;
     }
 }

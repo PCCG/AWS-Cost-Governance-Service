@@ -2,7 +2,7 @@ const axios = require('axios');
 
 
 //This client will handle all the account related calls. An account might comprise of the IAM user credentials,
-//alias names and may contain configurations specific to the account. 
+//alias names and may contain configurations specific to the account.
 const esAwsAccountsClient = axios.create({
     baseURL: process.env.ES_AWS_ACCOUNTS_BASE_URL,
     headers: {
@@ -28,7 +28,7 @@ const esAwsS3Client = axios.create({
     headers: {
         "Content-Type": "application/json",
         "Accept": "application/json"
-    }    
+    }
 });
 
 
@@ -42,8 +42,8 @@ module.exports = {
         const awsAccounts = response.data.hits.hits.map(searchResult => searchResult["_source"]);
         return awsAccounts;
     },
-    getAccountDetail: async (accessId) => {
-        const response = await esAwsAccountsClient.get('/_doc/' + accessId);
+    getAccountDetail: async (accessKeyId) => {
+        const response = await esAwsAccountsClient.get('/_doc/' + accessKeyId);
         if(response.data.found){
             const awsAccount = response.data['_source'];
             return awsAccount;
@@ -51,5 +51,8 @@ module.exports = {
             return null;
         }
     },
-    saveInstances: (accessId, listOfInstances) => esAwsEc2Client.post('/_doc/' + accessId, {listOfInstances})
+    deleteAccount: async (accessKeyId) => {
+        await esAwsAccountsClient.delete('/_doc/' + accessKeyId);
+    },
+    saveInstances: (accessKeyId, listOfInstances) => esAwsEc2Client.post('/_doc/' + accessKeyId, {listOfInstances})
 }

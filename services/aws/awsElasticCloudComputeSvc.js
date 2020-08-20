@@ -1,4 +1,4 @@
-const AWS = require('../utils/awsUtil');
+const AWS = require('../../utils/awsUtil');
 
 const EC2_RESERVATIONS_KEY = 'Reservations';
 const EC2_INSTANCES_ID_PARAM_KEY = 'InstanceIds';
@@ -14,7 +14,7 @@ module.exports =  {
             let regionName = region.RegionName;
             ec2ServiceObject = AWS.createNewEC2Object(ec2ServiceObject.config.accessKeyId, ec2ServiceObject.config.secretAccessKey, regionName);
             ec2DataPromises.push(ec2ServiceObject.describeInstances().promise());
-        }    
+        }
         let ec2DataAcrossRegions = await Promise.all(ec2DataPromises);
         ec2DataAcrossRegions.forEach(listOfInstancesSpecificToRegion => {
             listOfInstancesSpecificToRegion[EC2_RESERVATIONS_KEY].forEach(function(instance){
@@ -76,8 +76,8 @@ module.exports =  {
             params[EC2_INSTANCES_ID_PARAM_KEY] = instancesSpecificToRegion;
             const operationDescription = `The following instances present in the region ${region} are going to be stopped: ${JSON.stringify(instancesSpecificToRegion)}`;
             const operationStatus = await ec2ServiceObject.stopInstances(params).promise();
-        } 
-    },  
+        }
+    },
     terminateEc2InstancesAssociatedWithAccount: async function (ec2ServiceObject, ec2Tags) {
         const params = {};
         const ec2InstancesAssociatedWithAccountByRegion = await this.listInstancesAssociatedWithAccountByRegion(ec2ServiceObject);
@@ -87,6 +87,6 @@ module.exports =  {
             params[EC2_INSTANCES_ID_PARAM_KEY] = instancesSpecificToRegion;
             const operationDescription = `The following instances present in the region ${region} are going to be terminated: ${JSON.stringify(instancesSpecificToRegion)}`;
             const operationStatus = await ec2ServiceObject.terminateInstances(params).promise();
-        } 
+        }
     }
 }
