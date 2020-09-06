@@ -1,5 +1,6 @@
 const moment = require('moment');
 const fs = require('fs');
+const path = require('path');
 
 const s3svc = require('../aws/awsSimpleStorageServiceSvc');
 
@@ -10,22 +11,27 @@ const s3svc = require('../aws/awsSimpleStorageServiceSvc');
 */
 
 //Aggregation can manually be initiated by a user. Generally, it's initiated by the monitoring service
-async function startAggregation (cur, s3ServiceObject) {
-  const fullPathToReport = await constructPathToReport(cur, s3ServiceObject);
-  const cuReportOctetStream = await s3svc.fetchObjectFromBucket(cur.getBucketName(), fullPathToReport, s3ServiceObject);
-  const cuReport = fs.createWriteStream('../../assets/cur/cuReport.csv.gz', {encoding: 'utf8'});
-  cuReport.write(cuReportOctetStream);
+async function startAggregation (awsAccount, s3ServiceObject) {
+  const fullPathToReport = await constructPathToReport(awsAccount, s3ServiceObject);
+  // Response of the type application/octet-stream. The response represents binary data and is passed to a stream
+  const cuReportOctetStream = await s3svc.fetchObjectFromBucket(awsAccount.s3Bucket, fullPathToReport, s3ServiceObject);
+  const cuReport = fs.createWriteStream(path.resolve(__dirname, '../../assets/cost-and-usage-report.csv.gz'), {encoding: 'utf8'});
+  // Wait for the file to be opened and then write data into the file
+  cuReport.on('open', () => {
+    cuReport.write(cuReportOctetStream);
+    cuReport.end();
+  });
 }
 
 //This method constructs the path to access the report that is present in a bucket.
-async function constructPathToReport (cur, s3ServiceObject) {
+async function constructPathToReport (awsAccount, s3ServiceObject) {
   const pathToReportKey = 'reportKeys';
-  const startDate = moment().startOf('month').format('YYYYMMDD'); //Date corresponding to the first day of the month
-  const endDate = moment().add(1, 'month').startOf('month').format('YYYYMMDD'); //Date corresponsing to the first day of the next month
-  const pathToManifestFile = `${cur.getPrefix()}/${cur.getReportName()}/${startDate}-${endDate}/${cur.getReportName()}-Manifest.json`; //The path to the manifest file
-  const manifestOctetStream = await s3svc.fetchObjectFromBucket(cur.getBucketName(), pathToManifestFile, s3ServiceObject); //The response is of the type application/octet-stream
+  const startDate = moment().subtract(1, 'month').startOf('month').format('YYYYMMDD'); //Date corresponding to the first day of the month
+  const endDate = moment().startOf('month').format('YYYYMMDD'); //Date corresponsing to the first day of the next month
+  const pathToManifestFile = `${awsAccount.reportPrefix}/${awsAccount.reportName}/${startDate}-${endDate}/${awsAccount.reportName}-Manifest.json`; //The path to the manifest file
+  const manifestOctetStream = await s3svc.fetchObjectFromBucket(awsAccount.s3Bucket, pathToManifestFile, s3ServiceObject); //The response is of the type application/octet-stream
   const manifestJson = JSON.parse(manifestOctetStream.toString('utf-8')); //Construct a JSON out of the response
-  const pathToReport = manifestJson[pathToReportKey];
+  const pathToReport = manifestJson[pathToReportKey][0];
   return pathToReport;
 }
 
