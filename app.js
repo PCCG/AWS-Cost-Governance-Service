@@ -20,7 +20,7 @@ const awsRdsRoute = require('./routes/aws/Rds');
 const gcpAccountsRoute = require('./routes/gcp/Accounts');
 
 // Spend Aggregation
-const aggregatorRoute = require('./routes/spend-aggregation/aggregation');
+const aggregatorRoute = require('./routes/spend-aggregation/aws/aggregation');
 
 
 const app = express();

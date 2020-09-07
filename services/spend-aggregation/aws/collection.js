@@ -2,7 +2,7 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 
-const s3svc = require('../aws/awsSimpleStorageServiceSvc');
+const s3svc = require('../../aws/awsSimpleStorageServiceSvc');
 
 /* The service is responsible for fetching Cost & Usage Reports (CURs) from a S3 bucket.
    To construct the path to the report, we process the CUR object that houses the prefix,
@@ -11,11 +11,11 @@ const s3svc = require('../aws/awsSimpleStorageServiceSvc');
 */
 
 //Aggregation can manually be initiated by a user. Generally, it's initiated by the monitoring service
-async function startAggregation (awsAccount, s3ServiceObject) {
+async function startCollection (awsAccount, s3ServiceObject) {
   const fullPathToReport = await constructPathToReport(awsAccount, s3ServiceObject);
   // Response of the type application/octet-stream. The response represents binary data and is passed to a stream
   const cuReportOctetStream = await s3svc.fetchObjectFromBucket(awsAccount.s3Bucket, fullPathToReport, s3ServiceObject);
-  const cuReport = fs.createWriteStream(path.resolve(__dirname, '../../assets/cost-and-usage-report.csv.gz'), {encoding: 'utf8'});
+  const cuReport = fs.createWriteStream(path.resolve(__dirname, '../../../assets/cost-and-usage-report.csv.gz'), {encoding: 'utf8'});
   // Wait for the file to be opened and then write data into the file
   cuReport.on('open', () => {
     cuReport.write(cuReportOctetStream);
