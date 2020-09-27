@@ -2,12 +2,17 @@ const Schema = require('mongoose').Schema;
 const Model = require('mongoose').model;
 
 const AwsCollectionStatusSchema = new Schema({
-    triggered: {
-        type: Date,
+    collectionStatus: {
+        type: String,
+        enum: ['success', 'failed'],
+        default: 'success'
+    },
+    accountId: {
+        type: String,
         required: true
     },
-    status: {
-        type: String,
+    timestamp: {
+        type: Date,
         required: true
     }
 });
