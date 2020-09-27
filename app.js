@@ -35,7 +35,7 @@ app.use(cookieParser());
 /*The order in which routers are specified does matter. The middlewares that are specific to the
 routes that are specified first somehow act upon the router (which does not house any middlewares)
 that is specified in the end.*/
-app.use(AWS_API_ENDPOINT, aggregatorRoute);
+app.use(`${AWS_API_ENDPOINT}/aggregation`, aggregatorRoute);
 app.use(AWS_API_ENDPOINT, awsAccountsRoute);
 app.use(`${GCP_API_ENDPOINT}/accounts/`, gcpAccountsRoute);
 app.use(AWS_API_ENDPOINT, awsEc2Route);
