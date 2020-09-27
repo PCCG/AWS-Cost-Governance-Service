@@ -17,28 +17,27 @@ async function startCollection (awsAccount, s3ServiceObject) {
   const directoryPath = path.resolve(__dirname, `../../../assets/aws/cur/${awsAccount.aliasName}`);
   const collectionStatus = new AwsCollectionStatus();
   collectionStatus.accountId = awsAccount._id;
-  collectionStatus.timestamp = new Date().toDateString();
+  collectionStatus.timestamp = new Date();
   // Store the reports in a folder with a name that represents the alias name for the account
-  if (!fs.existsSync(directoryPath)){
-    fs.mkdirSync(directoryPath, { recursive: true });
-  } else {
-    const billingPeriod = `${moment().startOf('month').format('YYYYMMDD')}-${moment().add(1, 'month').startOf('month').format('YYYYMMDD')}`; //Date corresponding to the first day of the month
-    const pathToManifestFile = `${prefix}${billingPeriod}/${awsAccount.reportName}-Manifest.json`;
-    await fetchReportFromBucket(awsAccount, directoryPath, billingPeriod, pathToManifestFile, s3ServiceObject);
-    return;
-  }
   try {
-    const response = await s3ServiceObject.listObjectsV2({
-      Bucket: awsAccount.s3Bucket,
-      Delimiter: '/',
-      Prefix: prefix
-    }).promise();
-    const foldersToProcess = response[foldersToProcessKey];
-    foldersToProcess.forEach(async (folder) => {
-      const billingPeriod = folder.Prefix.replace(prefix, '').replace('/', '');
-      const pathToManifestFile = `${folder.Prefix}${awsAccount.reportName}-Manifest.json`; //The path to the manifest file
-      fetchReportFromBucket(awsAccount, directoryPath, billingPeriod, pathToManifestFile, s3ServiceObject);
-    });
+    if (!fs.existsSync(directoryPath)){
+      fs.mkdirSync(directoryPath, { recursive: true });
+      const response = await s3ServiceObject.listObjectsV2({
+        Bucket: awsAccount.s3Bucket,
+        Delimiter: '/',
+        Prefix: prefix
+      }).promise();
+      const foldersToProcess = response[foldersToProcessKey];
+      foldersToProcess.forEach(async (folder) => {
+        const billingPeriod = folder.Prefix.replace(prefix, '').replace('/', '');
+        const pathToManifestFile = `${folder.Prefix}${awsAccount.reportName}-Manifest.json`; //The path to the manifest file
+        fetchReportFromBucket(awsAccount, directoryPath, billingPeriod, pathToManifestFile, s3ServiceObject);
+      });
+    } else {
+      const billingPeriod = `${moment().startOf('month').format('YYYYMMDD')}-${moment().add(1, 'month').startOf('month').format('YYYYMMDD')}`; //Date corresponding to the first day of the month
+      const pathToManifestFile = `${prefix}${billingPeriod}/${awsAccount.reportName}-Manifest.json`;
+      await fetchReportFromBucket(awsAccount, directoryPath, billingPeriod, pathToManifestFile, s3ServiceObject);
+    }
   } catch (e) {
     collectionStatus.collectionStatus = 'failed';
     console.log(e.message);
