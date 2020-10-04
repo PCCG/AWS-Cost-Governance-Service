@@ -1,5 +1,6 @@
 const moment = require('moment');
 const fs = require('fs');
+const util = require('util');
 const path = require('path');
 
 const s3svc = require('../../aws/awsSimpleStorageServiceSvc');
@@ -21,7 +22,7 @@ async function startCollection (awsAccount, s3ServiceObject) {
   // Store the reports in a folder with a name that represents the alias name for the account
   try {
     if (!fs.existsSync(directoryPath)){
-      fs.mkdirSync(directoryPath, { recursive: true });
+      await util.promisify(fs.mkdir)(directoryPath, { recursive: true });
       const response = await s3ServiceObject.listObjectsV2({
         Bucket: awsAccount.s3Bucket,
         Delimiter: '/',
