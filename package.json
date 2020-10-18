@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node --experimental-worker ./bin/www"
   },
   "dependencies": {
     "@fast-csv/parse": "^4.3.2",

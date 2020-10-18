@@ -2,14 +2,12 @@ const moment = require('moment');
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
-const zlib = require('zlib');
-const { parse } = require('@fast-csv/parse');
+
 
 const s3svc = require('../../aws/awsSimpleStorageServiceSvc');
+const processReport = require('./process-cur');
 
 const AwsCollectionStatus = require('../../../models/collection/aws/collection-status');
-
-const convertBufferToStream = require('../../../utils/bufferToStream');
 
 /* The service is responsible for fetching Cost & Usage Reports (CURs) from a S3 bucket.
    To construct the path to the report, we process the CUR object that houses the prefix,
@@ -64,20 +62,7 @@ async function fetchReportFromBucket (awsAccount, pathToManifestFile, s3ServiceO
   const pathToReport = manifestJson[pathToReportKey][0];
   // Response of the type application/octet-stream. The response represents binary data and is passed to a stream
   const cuReportOctetStream = await s3svc.fetchObjectFromBucket(awsAccount.s3Bucket, pathToReport, s3ServiceObject);
-  const cuReportStream = convertBufferToStream(cuReportOctetStream);
-  const rows_in_report = [];
-  cuReportStream
-    .pipe(zlib.createUnzip())
-    .pipe(parse({ headers: true }))
-    .on('data', row => {
-      if(parseFloat(row['lineItem/UnblendedCost']) || parseFloat(row['lineItem/BlendedCost'])) {
-        rows_in_report.push(row);
-      }
-    })
-    .on('end', number_of_records => {
-      collectionStatus.number_of_records = number_of_records;
-      collectionStatus.save();
-    });
+  processReport(cuReportOctetStream, collectionStatus);
 }
 
 
