@@ -14,6 +14,9 @@ const AwsCollectionStatusSchema = new Schema({
     timestamp: {
         type: Date,
         required: true
+    },
+    number_of_records: {
+        type: Number
     }
 });
 
