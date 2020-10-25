@@ -9,15 +9,15 @@ const awsCollectionSvc = require('../../../services/spend-aggregation/aws/collec
 const AWS = require('../../../utils/awsUtil');
 
 aggregationRoute.post('/start-collection', async (req, res) => {
-  try {
+  // try {
     const accountId = req.body.accountId;
     const awsAccount = await AwsAccount.findById(accountId);
     const s3ServiceObject = AWS.createNewS3Object(awsAccount.accessKeyId, awsAccount.secretAccessKey);
     await awsCollectionSvc.startCollection(awsAccount, s3ServiceObject); //Kicks off aggregation
     res.send();
-  } catch (e) {
-    res.status(500).send(e.message);
-  }
+  // } catch (e) {
+  //   res.status(500).send(e.message);
+  // }
 });
 
 aggregationRoute.get('/collection-status', async (req, res) => {
