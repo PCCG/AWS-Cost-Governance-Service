@@ -8,7 +8,7 @@ const AwsCurProcessedData = require('../../../models/collection/aws/processed-da
 if (!isMainThread) {
     // Code to be handled by the worker should be written within this block. Trying to parse the report outside of this block
     // might end up blocking the event loop.
-    const cost_reports = [];
+    let cost_reports = [];
     let total_number_of_records = 0;
     const cuReportOctetStreams = workerData;
     cuReportOctetStreams.forEach(cuReportOctetStream => {
@@ -57,7 +57,10 @@ if (!isMainThread) {
         cost_reports.push(cost_report);
         total_number_of_records += number_of_records;
         if (cost_reports.length === cuReportOctetStreams.length) {
-          parentPort.postMessage({total_number_of_records, cost_reports});
+            cost_reports = cost_reports.sort((cost_report_1, cost_report_2) => {
+                return new Date(Object.keys(cost_report_1)[0].split('-')[0]) - new Date(Object.keys(cost_report_2)[0].split('-')[0]);
+            });   
+            parentPort.postMessage({total_number_of_records, cost_reports});
         }
       });
     });
