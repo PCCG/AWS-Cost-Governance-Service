@@ -29,8 +29,7 @@ const AwsAccountSchema = new Schema({
         required: true
     },
     reportPrefix: {
-        type: String,
-        required: true
+        type: String
     }
 });
 

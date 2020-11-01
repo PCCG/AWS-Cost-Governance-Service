@@ -3,6 +3,7 @@ const aggregationRoute = express.Router();
 
 const AwsAccount = require('../../../models/aws/AwsAccount');
 const AwsCollectionStatus = require('../../../models/collection/aws/collection-status');
+const AwsCurProcessedData = require('../../../models/collection/aws/processed-data');
 
 const awsCollectionSvc = require('../../../services/spend-aggregation/aws/collection');
 
@@ -26,6 +27,16 @@ aggregationRoute.get('/collection-status', async (req, res) => {
     const collectionStatus = await AwsCollectionStatus.find({accountId});
     res.send(collectionStatus);
   } catch (e) {
+    console.log(e.message);
+    res.status(500).send();
+  }
+});
+
+aggregationRoute.get('/processed-data', async (req, res) => {
+  try {
+    const awsCurProcessedData = await AwsCurProcessedData.findOne({accountId: req.query.accountId});
+    res.send(awsCurProcessedData);
+  } catch(e) {
     console.log(e.message);
     res.status(500).send();
   }
