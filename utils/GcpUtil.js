@@ -8,7 +8,7 @@
 const { BigQuery } = require("@google-cloud/bigquery");
 
 module.exports = {
-	createBigQuerySvcObj() {
-		return new BigQuery();
+	createBigQuerySvcObj(credentails) {
+		return new BigQuery(credentails);
 	},
 };

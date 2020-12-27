@@ -1,6 +1,4 @@
 const moment = require("moment");
-const fs = require("fs");
-const util = require("util");
 const path = require("path");
 
 const s3svc = require("../../aws/awsSimpleStorageServiceSvc");
