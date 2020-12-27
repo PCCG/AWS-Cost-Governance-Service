@@ -10,6 +10,7 @@ const gcpAccountSchema = new Schema({
 	privateKey: {
 		type: String,
 		required: true,
+		unique: true,
 	},
 	clientEmail: {
 		type: String,
