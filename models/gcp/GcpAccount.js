@@ -27,6 +27,10 @@ const gcpAccountSchema = new Schema({
 	pollingInterval: {
 		type: Number,
 	},
+	billingAccount: {
+		type: String,
+		required: true,
+	},
 });
 
 const GcpAccount = Model("GcpAccount", gcpAccountSchema);

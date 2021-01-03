@@ -15,7 +15,7 @@ GcpSpendAggregationRoute.post("/start-collection", async function (req, res) {
 	try {
 		const bigQuerySvcObj = res.locals.serviceObject;
 		const gcpAccount = await GcpAccount.findById(req.body.accountId);
-		await GcpSpendAggregationSvc.startCollection(bigQuerySvcObj, gcpAccount.bigQueryDataset);
+		await GcpSpendAggregationSvc.startCollection(bigQuerySvcObj, gcpAccount.bigQueryDataset, gcpAccount.billingAccount);
 	} catch (e) {
 		console.log(e.message);
 		res.status(500).send();
