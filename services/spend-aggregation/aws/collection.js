@@ -1,4 +1,3 @@
-const moment = require("moment");
 const path = require("path");
 
 const s3svc = require("../../aws/awsSimpleStorageServiceSvc");
