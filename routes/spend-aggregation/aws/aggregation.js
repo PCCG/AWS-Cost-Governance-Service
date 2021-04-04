@@ -2,8 +2,7 @@ const express = require("express");
 const aggregationRoute = express.Router();
 
 const AwsAccount = require("../../../models/aws/AwsAccount");
-const AwsCollectionStatus = require("../../../models/collection/aws/collection-status");
-const AwsCurProcessedData = require("../../../models/collection/aws/processed-data");
+const CostReport = require("../../../models/collection/cost-report");
 
 const awsCollectionSvc = require("../../../services/spend-aggregation/aws/collection");
 
@@ -21,20 +20,9 @@ aggregationRoute.post("/start-collection", async (req, res) => {
 	}
 });
 
-// aggregationRoute.get("/collection-status", async (req, res) => {
-// 	try {
-// 		const accountId = req.query.accountId;
-// 		const collectionStatus = await AwsCollectionStatus.find({ accountId });
-// 		res.send(collectionStatus);
-// 	} catch (e) {
-// 		console.log(e.message);
-// 		res.status(500).send();
-// 	}
-// });
-
 aggregationRoute.get("/processed-data", async (req, res) => {
 	try {
-		const awsCurProcessedData = await AwsCurProcessedData.aggregate([
+		const awsCurProcessedData = await CostReport.aggregate([
 			{
 				$match: {
 					accountId: req.query.accountId,
@@ -42,7 +30,7 @@ aggregationRoute.get("/processed-data", async (req, res) => {
 			},
 			{
 				$lookup: {
-					from: "awscollectionstatuses",
+					from: "collectionstatuses",
 					localField: "collectionStatuses",
 					foreignField: "_id",
 					as: "collectionStatuses",

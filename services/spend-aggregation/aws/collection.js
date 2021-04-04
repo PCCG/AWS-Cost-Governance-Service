@@ -3,7 +3,7 @@ const path = require("path");
 const s3svc = require("../../aws/awsSimpleStorageServiceSvc");
 const processReport = require("./process-cur");
 
-const AwsCollectionStatus = require("../../../models/collection/aws/collection-status");
+const CollectionStatus = require("../../../models/collection/collection-status");
 
 /* The service is responsible for fetching Cost & Usage Reports (CURs) from a S3 bucket.
    To construct the path to the report, we process the CUR object that houses the prefix,
@@ -39,7 +39,7 @@ async function startCollection(awsAccount, s3ServiceObject) {
 }
 
 function create_collection_status(awsAccountId) {
-	const collectionStatus = new AwsCollectionStatus();
+	const collectionStatus = new CollectionStatus();
 	collectionStatus.accountId = awsAccountId;
 	collectionStatus.timestamp = new Date();
 	return collectionStatus;
